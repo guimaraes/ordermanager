@@ -7,7 +7,7 @@
 4. [Configurações](#configurações)
 5. [Endpoints](#endpoints)
 6. [Exceções](#exceções)
-7. [Diagrama de Entidade-Relacionamento (DER)](#diagrama-de-entidade-relacionamento-der)
+7. [Diagrama de Entidade Relacional](#diagrama-de-entidade-relacional)
 
 ## Descrição
 A **Order Manager API** é um sistema desenvolvido em **Spring Boot** para gerenciar pedidos de compra. Ele permite a criação, atualização, recuperação e exclusão de fornecedores, produtos, clientes, pedidos e envios. A API fornece endpoints RESTful e utiliza o **PostgreSQL** como banco de dados.
@@ -104,70 +104,12 @@ A API possui exceções personalizadas para erros específicos:
 
 Todas as exceções retornam status **404 Not Found** e mensagens descritivas.
 
-## Diagrama de Entidade-Relacionamento (DER)
-Aqui está o Diagrama de Entidade-Relacionamento para o projeto:
+## Diagrama de Entidade Relacional
 ```mermaid
 erDiagram
-    CUSTOMER {
-        UUID id
-        string name
-        string email
-        string phoneNumber
-    }
-    ORDER {
-        UUID id
-        UUID customerId
-        datetime orderDate
-        string status
-        decimal totalAmount
-    }
-    ORDER_ITEM {
-        UUID id
-        UUID orderId
-        UUID productId
-        int quantity
-        decimal unitPrice
-        decimal totalPrice
-    }
-    PRODUCT {
-        UUID id
-        string name
-        string description
-        decimal price
-        UUID supplierId
-    }
-    SUPPLIER {
-        UUID id
-        string name
-        string email
-        string phoneNumber
-    }
-    PAYMENT {
-        UUID id
-        UUID orderId
-        datetime paymentDate
-        string status
-        decimal amountPaid
-        string paymentMethod
-    }
-    SHIPMENT {
-        UUID id
-        UUID orderId
-        datetime shippedDate
-        string trackingNumber
-        string status
-    }
-    ORDER_HISTORY {
-        UUID id
-        UUID orderId
-        datetime timestamp
-        string oldStatus
-        string newStatus
-        string updatedBy
-    }
-    CUSTOMER ||--o{ ORDER : realiza
+    CUSTOMER ||--o{ ORDER : possui
     ORDER ||--o{ ORDER_ITEM : contém
-    ORDER_ITEM }|--|| PRODUCT : refere-se_a
+    ORDER_ITEM }|--|| PRODUCT : refere-se a
     PRODUCT }|--|| SUPPLIER : fornecido_por
     ORDER ||--|| PAYMENT : possui
     ORDER ||--|| SHIPMENT : possui

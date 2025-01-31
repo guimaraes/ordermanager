@@ -1,23 +1,20 @@
 # Order Manager API
 
 ## Índice
-1. [Descrição](#descrição)
+1. [Descrição do Projeto](#descricao-do-projeto)
 2. [Tecnologias Utilizadas](#tecnologias-utilizadas)
 3. [Estrutura do Projeto](#estrutura-do-projeto)
-4. [Configurações](#configurações)
-    - [application.yml](#applicationyml)
-    - [pom.xml](#pomxml)
-5. [Endpoints](#endpoints)
-    - [SupplierController](#suppliercontroller)
-    - [ProductController](#productcontroller)
-    - [OrderController](#ordercontroller)
-6. [Tratamento de Exceções](#tratamento-de-exceções)
-7. [Diagrama de Entidade-Relacionamento](#diagrama-de-entidade-relacionamento)
+4. [Configurações](#configuracoes)
+5. [Endpoints das Controllers](#endpoints-das-controllers)
+6. [Exceções Tratadas](#excecoes-tratadas)
+7. [Diagrama de Entidade Relacional (DER)](#diagrama-de-entidade-relacional)
 
 ---
 
-## Descrição
-O **Order Manager API** é um sistema desenvolvido para gerenciar pedidos, fornecedores, produtos e pagamentos de forma eficiente e escalável. A API permite criar, atualizar, excluir e listar pedidos, clientes, fornecedores e produtos. Utiliza o banco de dados PostgreSQL e fornece documentação via Swagger UI.
+## Descrição do Projeto
+A **Order Manager API** é uma aplicação desenvolvida para o gerenciamento de pedidos, fornecendo operações de criação, atualização, remoção e consulta de pedidos, produtos, fornecedores, pagamentos e entregas.
+
+A API é construída utilizando **Spring Boot 3.4.2**, com persistência em **PostgreSQL**, suporte para documentação via **SpringDoc OpenAPI** e caching embutido para otimizar a performance.
 
 ---
 
@@ -25,45 +22,54 @@ O **Order Manager API** é um sistema desenvolvido para gerenciar pedidos, forne
 - **Java 21**
 - **Spring Boot 3.4.2**
 - **Spring Data JPA**
-- **PostgreSQL**
-- **Lombok**
+- **Spring Validation**
 - **Spring Boot Actuator**
-- **SpringDoc OpenAPI**
-- **MapStruct**
+- **PostgreSQL 42.7.4**
+- **Lombok 1.18.36**
+- **MapStruct 1.6.3**
+- **SpringDoc OpenAPI 2.2.0**
+- **Maven 3.8.1**
 
 ---
 
 ## Estrutura do Projeto
-
 ```
 ordermanager/
-│── src/main/java/br/com/ambevtech/ordermanager/
-│   ├── controller/       # Controladores REST
-│   ├── service/          # Serviços de negócio
-│   ├── repository/       # Repositórios JPA
-│   ├── model/            # Modelos de entidade
-│   ├── dto/              # DTOs para requisição e resposta
-│   ├── mapper/           # Conversores de entidade para DTO
-│   ├── exception/        # Classes de exceção personalizadas
-│   ├── config/           # Configurações gerais da aplicação
-│── src/main/resources/
-│   ├── application.yml   # Configuração da aplicação
-│── pom.xml               # Configuração do Maven e dependências
+│-- src/
+│   ├── main/
+│   │   ├── java/br/com/ambevtech/ordermanager/
+│   │   │   ├── controller/
+│   │   │   ├── dto/
+│   │   │   ├── exception/
+│   │   │   ├── mapper/
+│   │   │   ├── model/
+│   │   │   │   ├── enums/
+│   │   │   ├── repository/
+│   │   │   ├── service/
+│   │   │   ├── config/
+│   ├── resources/
+│   │   ├── application.yml
+│-- pom.xml
 ```
 
 ---
 
 ## Configurações
-### application.yml
+
+### `application.yml`
 ```yaml
 server:
   port: 8080
 
 spring:
+  application:
+    name: order-manager
+
   datasource:
     url: jdbc:postgresql://localhost:5432/ordermanager
     username: postgres
     password: passw@rd
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -81,106 +87,112 @@ management:
     web:
       exposure:
         include: "*"
-```
-
-### pom.xml
-```xml
-<dependencies>
-   <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-   </dependency>
-   <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-   </dependency>
-   <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-   </dependency>
-</dependencies>
+  health:
+    show-details: always
 ```
 
 ---
 
-## Endpoints
+## Endpoints das Controllers
 
-### SupplierController
-- `GET /api/suppliers` - Retorna todos os fornecedores.
-- `GET /api/suppliers/{id}` - Retorna um fornecedor pelo ID.
-- `POST /api/suppliers` - Cria um novo fornecedor.
-- `PUT /api/suppliers/{id}` - Atualiza um fornecedor existente.
-- `DELETE /api/suppliers/{id}` - Remove um fornecedor.
+### `SupplierController`
+- `GET /api/suppliers` → Lista todos os fornecedores
+- `GET /api/suppliers/{id}` → Obtém um fornecedor pelo ID
+- `POST /api/suppliers` → Cria um novo fornecedor
+- `PUT /api/suppliers/{id}` → Atualiza um fornecedor existente
+- `DELETE /api/suppliers/{id}` → Remove um fornecedor
 
-### ProductController
-- `GET /api/products` - Retorna todos os produtos.
-- `GET /api/products/{id}` - Retorna um produto pelo ID.
-- `POST /api/products` - Cria um novo produto.
-- `PUT /api/products/{id}` - Atualiza um produto existente.
-- `DELETE /api/products/{id}` - Remove um produto.
+### `ProductController`
+- `GET /api/products` → Lista todos os produtos
+- `GET /api/products/{id}` → Obtém um produto pelo ID
+- `POST /api/products` → Cria um novo produto
+- `PUT /api/products/{id}` → Atualiza um produto existente
+- `DELETE /api/products/{id}` → Remove um produto
 
-### OrderController
-- `GET /api/orders` - Lista todos os pedidos.
-- `GET /api/orders/{id}` - Retorna um pedido pelo ID.
-- `GET /api/orders/customer/{customerId}` - Retorna pedidos de um cliente específico.
-- `POST /api/orders` - Cria um novo pedido.
-
----
-
-## Tratamento de Exceções
-- `SupplierNotFoundException` - Fornecedor não encontrado.
-- `ProductNotFoundException` - Produto não encontrado.
-- `OrderNotFoundException` - Pedido não encontrado.
-- `CustomerNotFoundException` - Cliente não encontrado.
-- `ShipmentNotFoundException` - Entrega não encontrada.
+### `OrderController`
+- `GET /api/orders` → Lista todos os pedidos
+- `GET /api/orders/{id}` → Obtém um pedido pelo ID
+- `GET /api/orders/customer/{customerId}` → Obtém os pedidos de um cliente
+- `POST /api/orders` → Cria um novo pedido
 
 ---
 
-## Diagrama de Entidade-Relacionamento
+## Exceções Tratadas
+- **SupplierNotFoundException** → Lançada quando um fornecedor não é encontrado.
+- **ProductNotFoundException** → Lançada quando um produto não é encontrado.
+- **OrderNotFoundException** → Lançada quando um pedido não é encontrado.
+- **CustomerNotFoundException** → Lançada quando um cliente não é encontrado.
+- **ShipmentNotFoundException** → Lançada quando uma entrega não é encontrada.
+
+---
+
+## Diagrama de Entidade Relacional
 ```mermaid
 erDiagram
     CUSTOMER {
-        UUID id
+        UUID id PK
         string name
         string email
         string phoneNumber
     }
+    
     ORDER {
-        UUID id
-        UUID customer_id
-        LocalDateTime orderDate
-        string status
+        UUID id PK
+        UUID customer_id FK
+        datetime orderDate
+        enum status
         decimal totalAmount
     }
-    PRODUCT {
-        Long id
-        string name
-        string description
-        decimal price
-        Long supplier_id
-    }
+    
     ORDER_ITEM {
-        UUID id
-        UUID order_id
-        Long product_id
+        UUID id PK
+        UUID order_id FK
+        UUID product_id FK
         int quantity
         decimal unitPrice
         decimal totalPrice
     }
+    
+    PRODUCT {
+        UUID id PK
+        string name
+        string description
+        decimal price
+        UUID supplier_id FK
+    }
+    
     SUPPLIER {
-        Long id
+        UUID id PK
         string name
         string email
         string phoneNumber
     }
-
-    CUSTOMER ||--o{ ORDER : places
-    ORDER ||--o{ ORDER_ITEM : contains
-    PRODUCT ||--o{ ORDER_ITEM : includes
-    SUPPLIER ||--o{ PRODUCT : supplies
+    
+    SHIPMENT {
+        UUID id PK
+        UUID order_id FK
+        datetime shippedDate
+        string trackingNumber
+        enum status
+    }
+    
+    PAYMENT {
+        UUID id PK
+        UUID order_id FK
+        datetime paymentDate
+        decimal amountPaid
+        string paymentMethod
+    }
+    
+    CUSTOMER ||--o{ ORDER : possui
+    ORDER ||--o{ ORDER_ITEM : contém
+    ORDER_ITEM ||--|{ PRODUCT : referencia
+    PRODUCT ||--|{ SUPPLIER : fornecido_por
+    ORDER ||--|{ PAYMENT : possui_pagamento
+    ORDER ||--|{ SHIPMENT : possui_entrega
 ```
 
 ---
 
-## Conclusão
-O **Order Manager API** é uma aplicação robusta desenvolvida com Spring Boot para gerenciamento de pedidos, produtos e fornecedores. Ele fornece uma API REST bem documentada e eficiente, utilizando boas práticas de arquitetura e persistência de dados. Com isso, a aplicação se torna uma solução escalável e confiável para operações comerciais.
+Este README documenta todos os detalhes necessários para a compreensão e uso da **Order Manager API**.
+

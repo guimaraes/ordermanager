@@ -117,23 +117,23 @@ erDiagram
     ORDER {
         UUID id
         UUID customerId
-        LocalDateTime orderDate
-        OrderStatus status
-        BigDecimal totalAmount
+        datetime orderDate
+        string status
+        decimal totalAmount
     }
     ORDER_ITEM {
         UUID id
         UUID orderId
         UUID productId
         int quantity
-        BigDecimal unitPrice
-        BigDecimal totalPrice
+        decimal unitPrice
+        decimal totalPrice
     }
     PRODUCT {
         UUID id
         string name
         string description
-        BigDecimal price
+        decimal price
         UUID supplierId
     }
     SUPPLIER {
@@ -145,4 +145,35 @@ erDiagram
     PAYMENT {
         UUID id
         UUID orderId
-        LocalDate
+        datetime paymentDate
+        string status
+        decimal amountPaid
+        string paymentMethod
+    }
+    SHIPMENT {
+        UUID id
+        UUID orderId
+        datetime shippedDate
+        string trackingNumber
+        string status
+    }
+    ORDER_HISTORY {
+        UUID id
+        UUID orderId
+        datetime timestamp
+        string oldStatus
+        string newStatus
+        string updatedBy
+    }
+    CUSTOMER ||--o{ ORDER : realiza
+    ORDER ||--o{ ORDER_ITEM : contém
+    ORDER_ITEM }|--|| PRODUCT : refere-se_a
+    PRODUCT }|--|| SUPPLIER : fornecido_por
+    ORDER ||--|| PAYMENT : possui
+    ORDER ||--|| SHIPMENT : possui
+    ORDER ||--o{ ORDER_HISTORY : tem_historico
+```
+
+## Conclusão
+A **Order Manager API** é um sistema robusto para gerenciamento de pedidos, oferecendo endpoints bem definidos, autenticação, logs de eventos e integração com PostgreSQL. O código segue boas práticas e utiliza tecnologias modernas para garantir performance e escalabilidade.
+

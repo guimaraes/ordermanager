@@ -7,7 +7,7 @@
 4. [Configurações](#configurações)
 5. [Endpoints](#endpoints)
 6. [Exceções](#exceções)
-7. [Diagrama de Entidade Relacional](#diagrama-de-entidade-relacional)
+7. [Diagrama de Entidade-Relacionamento (DER)](#diagrama-de-entidade-relacionamento-der)
 
 ## Descrição
 A **Order Manager API** é um sistema desenvolvido em **Spring Boot** para gerenciar pedidos de compra. Ele permite a criação, atualização, recuperação e exclusão de fornecedores, produtos, clientes, pedidos e envios. A API fornece endpoints RESTful e utiliza o **PostgreSQL** como banco de dados.
@@ -104,18 +104,45 @@ A API possui exceções personalizadas para erros específicos:
 
 Todas as exceções retornam status **404 Not Found** e mensagens descritivas.
 
-## Diagrama de Entidade Relacional
+## Diagrama de Entidade-Relacionamento (DER)
+Aqui está o Diagrama de Entidade-Relacionamento para o projeto:
 ```mermaid
 erDiagram
-    CUSTOMER ||--o{ ORDER : possui
-    ORDER ||--o{ ORDER_ITEM : contem
-    ORDER_ITEM }|--|| PRODUCT : refere_se_a
-    PRODUCT }|--|| SUPPLIER : fornecido_por
-    ORDER ||--|| PAYMENT : possui
-    ORDER ||--|| SHIPMENT : possui
-    ORDER ||--o{ ORDER_HISTORY : tem_historico
-``` 
-
-## Conclusão
-A **Order Manager API** é um sistema robusto para gerenciamento de pedidos, oferecendo endpoints bem definidos, autenticação, logs de eventos e integração com PostgreSQL. O código segue boas práticas e utiliza tecnologias modernas para garantir performance e escalabilidade.
-
+    CUSTOMER {
+        UUID id
+        string name
+        string email
+        string phoneNumber
+    }
+    ORDER {
+        UUID id
+        UUID customerId
+        LocalDateTime orderDate
+        OrderStatus status
+        BigDecimal totalAmount
+    }
+    ORDER_ITEM {
+        UUID id
+        UUID orderId
+        UUID productId
+        int quantity
+        BigDecimal unitPrice
+        BigDecimal totalPrice
+    }
+    PRODUCT {
+        UUID id
+        string name
+        string description
+        BigDecimal price
+        UUID supplierId
+    }
+    SUPPLIER {
+        UUID id
+        string name
+        string email
+        string phoneNumber
+    }
+    PAYMENT {
+        UUID id
+        UUID orderId
+        LocalDate

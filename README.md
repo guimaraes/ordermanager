@@ -8,13 +8,16 @@
 5. [Endpoints das Controllers](#endpoints-das-controllers)
 6. [Exceções Tratadas](#excecoes-tratadas)
 7. [Diagrama de Entidade Relacional (DER)](#diagrama-de-entidade-relacional)
+8. [Conclusão](#conclusao)
 
 ---
 
 ## Descrição do Projeto
-A **Order Manager API** é uma aplicação desenvolvida para o gerenciamento de pedidos, fornecendo operações de criação, atualização, remoção e consulta de pedidos, produtos, fornecedores, pagamentos e entregas.
+A **Order Manager API** é uma aplicação robusta e escalável projetada para o gerenciamento de pedidos. Ela possibilita operações completas para criação, atualização, remoção e consulta de pedidos, produtos, fornecedores, pagamentos e entregas.
 
-A API é construída utilizando **Spring Boot 3.4.2**, com persistência em **PostgreSQL**, suporte para documentação via **SpringDoc OpenAPI** e caching embutido para otimizar a performance.
+A API foi desenvolvida utilizando **Spring Boot 3.4.2**, garantindo alta performance, escalabilidade e segurança. A persistência é gerenciada pelo **PostgreSQL**, um banco de dados relacional eficiente, e a documentação é gerada automaticamente através do **SpringDoc OpenAPI**. Além disso, a aplicação conta com caching embutido para otimização do desempenho e auditoria das operações.
+
+A arquitetura do sistema foi desenvolvida seguindo princípios SOLID e padrões RESTful, garantindo modularidade e facilidade na manutenção.
 
 ---
 
@@ -129,13 +132,19 @@ management:
 ## Diagrama de Entidade Relacional
 ```mermaid
 erDiagram
+    CUSTOMER ||--o{ ORDER : possui
+    ORDER ||--o{ ORDER_ITEM : contém
+    ORDER_ITEM ||--|{ PRODUCT : referencia
+    PRODUCT ||--|{ SUPPLIER : fornecido_por
+    ORDER ||--|{ PAYMENT : possui_pagamento
+    ORDER ||--|{ SHIPMENT : possui_entrega
+
     CUSTOMER {
         UUID id PK
         string name
         string email
         string phoneNumber
     }
-    
     ORDER {
         UUID id PK
         UUID customer_id FK
@@ -143,7 +152,6 @@ erDiagram
         enum status
         decimal totalAmount
     }
-    
     ORDER_ITEM {
         UUID id PK
         UUID order_id FK
@@ -152,7 +160,6 @@ erDiagram
         decimal unitPrice
         decimal totalPrice
     }
-    
     PRODUCT {
         UUID id PK
         string name
@@ -160,14 +167,12 @@ erDiagram
         decimal price
         UUID supplier_id FK
     }
-    
     SUPPLIER {
         UUID id PK
         string name
         string email
         string phoneNumber
     }
-    
     SHIPMENT {
         UUID id PK
         UUID order_id FK
@@ -175,7 +180,6 @@ erDiagram
         string trackingNumber
         enum status
     }
-    
     PAYMENT {
         UUID id PK
         UUID order_id FK
@@ -183,16 +187,14 @@ erDiagram
         decimal amountPaid
         string paymentMethod
     }
-    
-    CUSTOMER ||--o{ ORDER : possui
-    ORDER ||--o{ ORDER_ITEM : contém
-    ORDER_ITEM ||--|{ PRODUCT : referencia
-    PRODUCT ||--|{ SUPPLIER : fornecido_por
-    ORDER ||--|{ PAYMENT : possui_pagamento
-    ORDER ||--|{ SHIPMENT : possui_entrega
 ```
 
 ---
 
-Este README documenta todos os detalhes necessários para a compreensão e uso da **Order Manager API**.
+## Conclusão
+A **Order Manager API** é uma solução eficiente para o gerenciamento de pedidos, oferecendo operações essenciais para cadastro, consulta e atualização de fornecedores, produtos, pedidos, pagamentos e entregas.
+
+A implementação segue boas práticas de desenvolvimento, utilizando **Spring Boot**, **PostgreSQL**, e **MapStruct** para garantir performance e manutenção eficiente. Além disso, a documentação via **Swagger** facilita a integração e consumo da API por outros sistemas.
+
+Com um design modular, um banco de dados relacional bem estruturado e uma arquitetura escalável, esta API se apresenta como uma solução confiável e de fácil expansão para atender novas demandas no futuro.
 

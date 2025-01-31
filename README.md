@@ -133,7 +133,7 @@ management:
 ```mermaid
 erDiagram
     CUSTOMER ||--o{ ORDER : possui
-    ORDER ||--o{ ORDER_ITEM : contém
+    ORDER ||--o{ ORDER_ITEM : contem
     ORDER_ITEM ||--|{ PRODUCT : referencia
     PRODUCT ||--|{ SUPPLIER : fornecido_por
     ORDER ||--|{ PAYMENT : possui_pagamento

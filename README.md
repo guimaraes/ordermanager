@@ -108,13 +108,13 @@ Todas as exceções retornam status **404 Not Found** e mensagens descritivas.
 ```mermaid
 erDiagram
     CUSTOMER ||--o{ ORDER : possui
-    ORDER ||--o{ ORDER_ITEM : contém
-    ORDER_ITEM }|--|| PRODUCT : refere-se a
+    ORDER ||--o{ ORDER_ITEM : contem
+    ORDER_ITEM }|--|| PRODUCT : refere_se_a
     PRODUCT }|--|| SUPPLIER : fornecido_por
     ORDER ||--|| PAYMENT : possui
     ORDER ||--|| SHIPMENT : possui
     ORDER ||--o{ ORDER_HISTORY : tem_historico
-```
+``` 
 
 ## Conclusão
 A **Order Manager API** é um sistema robusto para gerenciamento de pedidos, oferecendo endpoints bem definidos, autenticação, logs de eventos e integração com PostgreSQL. O código segue boas práticas e utiliza tecnologias modernas para garantir performance e escalabilidade.

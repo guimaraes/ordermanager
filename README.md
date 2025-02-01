@@ -388,12 +388,12 @@ classDiagram
         FAILED
     }
 
-    Customer "1" --o{ "0..*" Order : possui
-    Order "1" --o{ "0..*" OrderItem : contem
-    OrderItem "1" --|{ "1" Product : referencia
-    Product "1" --|{ "1" Supplier : fornecido_por
-    Order "1" --|{ "1" Payment : possui_pagamento
-    Order "1" --|{ "1" Shipment : possui_entrega
+    Customer "1" ||--o{ "0..*" Order : possui
+    Order "1" ||--o{ "0..*" OrderItem : contem
+    OrderItem "1" ||--|{ "1" Product : referencia
+    Product "1" ||--|{ "1" Supplier : fornecido_por
+    Order "1" ||--|{ "1" Payment : possui_pagamento
+    Order "1" ||--|{ "1" Shipment : possui_entrega
     OrderStatus <|-- Order : tem_status
     PaymentStatus <|-- Payment : tem_status
     ShipmentStatus <|-- Shipment : tem_status

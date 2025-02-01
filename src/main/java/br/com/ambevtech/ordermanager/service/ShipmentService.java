@@ -20,17 +20,11 @@ public class ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
 
-    /**
-     * Obtém todas as entregas com paginação.
-     */
     public Page<Shipment> getAllShipments(Pageable pageable) {
         log.info("Buscando todas as entregas - Página: {}, Tamanho: {}", pageable.getPageNumber(), pageable.getPageSize());
         return shipmentRepository.findAll(pageable);
     }
 
-    /**
-     * Obtém uma entrega pelo ID.
-     */
     public Shipment getShipmentById(UUID id) {
         log.info("Buscando entrega com ID: {}", id);
         return shipmentRepository.findById(id)
@@ -40,18 +34,12 @@ public class ShipmentService {
                 });
     }
 
-    /**
-     * Registra uma nova entrega.
-     */
     @Transactional
     public Shipment createShipment(Shipment shipment) {
         log.info("Registrando nova entrega para o pedido ID: {}", shipment.getOrder().getId());
         return shipmentRepository.save(shipment);
     }
 
-    /**
-     * Atualiza os detalhes de uma entrega existente.
-     */
     @Transactional
     public Shipment updateShipment(UUID id, Shipment updatedShipment) {
         log.info("Atualizando entrega com ID: {}", id);
@@ -69,9 +57,6 @@ public class ShipmentService {
         return shipmentRepository.save(existingShipment);
     }
 
-    /**
-     * Atualiza o status da entrega.
-     */
     @Transactional
     public Shipment updateShipmentStatus(UUID id, ShipmentStatus status) {
         log.info("Atualizando status da entrega com ID: {} para {}", id, status);
@@ -86,9 +71,6 @@ public class ShipmentService {
         return shipmentRepository.save(shipment);
     }
 
-    /**
-     * Remove uma entrega pelo ID.
-     */
     @Transactional
     public void deleteShipment(UUID id) {
         log.info("Removendo entrega com ID: {}", id);

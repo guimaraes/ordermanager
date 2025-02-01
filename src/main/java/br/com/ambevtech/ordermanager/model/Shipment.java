@@ -30,8 +30,8 @@ public class Shipment {
     private LocalDateTime shippedDate;
 
     @Column(nullable = false)
-    private String trackingNumber; // Código de rastreamento
+    private String trackingNumber;
 
     @Enumerated(EnumType.STRING)
-    private ShipmentStatus status; // Status do envio
+    private ShipmentStatus status;
 }

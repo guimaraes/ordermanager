@@ -389,7 +389,7 @@ classDiagram
     }
 
     Customer "1" --o{ "0..*" Order : possui
-    Order "1" --o{ "0..*" OrderItem : contém
+    Order "1" --o{ "0..*" OrderItem : contem
     OrderItem "1" --|{ "1" Product : referencia
     Product "1" --|{ "1" Supplier : fornecido_por
     Order "1" --|{ "1" Payment : possui_pagamento

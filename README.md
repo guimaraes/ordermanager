@@ -38,21 +38,116 @@ A arquitetura do sistema foi desenvolvida seguindo princípios SOLID e padrões 
 ## Estrutura do Projeto
 ```
 ordermanager/
-│-- src/
-│   ├── main/
-│   │   ├── java/br/com/ambevtech/ordermanager/
-│   │   │   ├── controller/
-│   │   │   ├── dto/
-│   │   │   ├── exception/
-│   │   │   ├── mapper/
-│   │   │   ├── model/
-│   │   │   │   ├── enums/
-│   │   │   ├── repository/
-│   │   │   ├── service/
-│   │   │   ├── config/
-│   ├── resources/
-│   │   ├── application.yml
-│-- pom.xml
+│   .gitattributes
+│   .gitignore
+│   HELP.md
+│   mvnw
+│   mvnw.cmd
+│   pom.xml
+│   README.md
+│
+├───.mvn
+│   └───wrapper
+│           maven-wrapper.properties
+│
+└───src
+    ├───main
+    │   ├───java
+    │   │   └───br
+    │   │       └───com
+    │   │           └───ambevtech
+    │   │               └───ordermanager
+    │   │                   │   OrderManagerApplication.java
+    │   │                   │
+    │   │                   ├───config
+    │   │                   │       SwaggerConfig.java
+    │   │                   │
+    │   │                   ├───controller
+    │   │                   │       OrderController.java
+    │   │                   │       ProductController.java
+    │   │                   │       SupplierController.java
+    │   │                   │
+    │   │                   ├───dto
+    │   │                   │       CustomerRequestDTO.java
+    │   │                   │       CustomerResponseDTO.java
+    │   │                   │       OrderHistoryRequestDTO.java
+    │   │                   │       OrderHistoryResponseDTO.java
+    │   │                   │       OrderItemRequestDTO.java
+    │   │                   │       OrderItemResponseDTO.java
+    │   │                   │       OrderRequestDTO.java
+    │   │                   │       OrderResponseDTO.java
+    │   │                   │       PaymentRequestDTO.java
+    │   │                   │       PaymentResponseDTO.java
+    │   │                   │       ProductRequestDTO.java
+    │   │                   │       ProductResponseDTO.java
+    │   │                   │       ShipmentRequestDTO.java
+    │   │                   │       ShipmentResponseDTO.java
+    │   │                   │       SupplierRequestDTO.java
+    │   │                   │       SupplierResponseDTO.java
+    │   │                   │
+    │   │                   ├───exception
+    │   │                   │       CustomerNotFoundException.java
+    │   │                   │       OrderNotFoundException.java
+    │   │                   │       ProductNotFoundException.java
+    │   │                   │       ShipmentNotFoundException.java
+    │   │                   │       SupplierNotFoundException.java
+    │   │                   │
+    │   │                   ├───mapper
+    │   │                   │       CustomerMapper.java
+    │   │                   │       OrderHistoryMapper.java
+    │   │                   │       OrderItemMapper.java
+    │   │                   │       OrderMapper.java
+    │   │                   │       PaymentMapper.java
+    │   │                   │       ProductMapper.java
+    │   │                   │       ShipmentMapper.java
+    │   │                   │       SupplierMapper.java
+    │   │                   │
+    │   │                   ├───model
+    │   │                   │   │   Customer.java
+    │   │                   │   │   Order.java
+    │   │                   │   │   OrderHistory.java
+    │   │                   │   │   OrderItem.java
+    │   │                   │   │   Payment.java
+    │   │                   │   │   Product.java
+    │   │                   │   │   Shipment.java
+    │   │                   │   │   Supplier.java
+    │   │                   │   │
+    │   │                   │   └───enums
+    │   │                   │           OrderStatus.java
+    │   │                   │           PaymentStatus.java
+    │   │                   │           ShipmentStatus.java
+    │   │                   │
+    │   │                   ├───repository
+    │   │                   │       CustomerRepository.java
+    │   │                   │       OrderHistoryRepository.java
+    │   │                   │       OrderItemRepository.java
+    │   │                   │       OrderRepository.java
+    │   │                   │       PaymentRepository.java
+    │   │                   │       ProductRepository.java
+    │   │                   │       ShipmentRepository.java
+    │   │                   │       SupplierRepository.java
+    │   │                   │
+    │   │                   └───service
+    │   │                           CustomerService.java
+    │   │                           OrderService.java
+    │   │                           ProductService.java
+    │   │                           ShipmentService.java
+    │   │                           SupplierService.java
+    │   │
+    │   └───resources
+    │       │   application.yml
+    │       │
+    │       └───db
+    │           └───migration
+    │                   V1__create_orders_table.sql
+    │
+    └───test
+        └───java
+            └───br
+                └───com
+                    └───ambevtech
+                        └───ordermanager
+                                OrderManagerApplicationTests.java
 ```
 
 ---

@@ -19,9 +19,10 @@
 	<properties>
 		<java.version>21</java.version>
 		<lombok.version>1.18.36</lombok.version>
-		<postgresql.version>42.7.4</postgresql.version>
 		<springdoc.version>2.2.0</springdoc.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
+		<mysql.version>8.0.33</mysql.version>
+		<flyway.version>9.19.3</flyway.version>
 	</properties>
 
 	<dependencies>
@@ -51,9 +52,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${postgresql.version}</version>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>${flyway.version}</version>
 		</dependency>
 
 		<dependency>
@@ -122,3 +129,4 @@
 		</plugins>
 	</build>
 </project>
+

@@ -89,7 +89,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 ```
-
 ## Endpoints
 
 As controllers da API são responsáveis por expor os endpoints REST para interação com os recursos do sistema. Cada controller está bem estruturada, seguindo as práticas recomendadas do Spring Boot.
@@ -98,41 +97,40 @@ As controllers da API são responsáveis por expor os endpoints REST para intera
 
 Responsável pelo gerenciamento de clientes.
 
-- **`GET /api/customers`** - Retorna uma lista paginada de clientes.
-- **`GET /api/customers/{id}`** - Busca um cliente pelo ID.
-- **`POST /api/customers`** - Cria um novo cliente.
-- **`PUT /api/customers/{id}`** - Atualiza os dados de um cliente existente.
-- **`DELETE /api/customers/{id}`** - Remove um cliente do sistema.
+- <span style="color: green;">**GET**</span> `/api/customers` - Retorna uma lista paginada de clientes.
+- <span style="color: green;">**GET**</span> `/api/customers/{id}` - Busca um cliente pelo ID.
+- <span style="color: blue;">**POST**</span> `/api/customers` - Cria um novo cliente.
+- <span style="color: orange;">**PUT**</span> `/api/customers/{id}` - Atualiza os dados de um cliente existente.
+- <span style="color: red;">**DELETE**</span> `/api/customers/{id}` - Remove um cliente do sistema.
 
 ### `OrderController`
 
 Responsável pelo gerenciamento de pedidos.
 
-- **`POST /api/orders`** - Cria um novo pedido associado a um cliente.
-- **`GET /api/orders`** - Retorna uma lista paginada de pedidos.
-- **`GET /api/orders/{id}`** - Busca um pedido pelo ID.
-- **`GET /api/orders/customer/{customerId}`** - Retorna todos os pedidos de um cliente específico.
+- <span style="color: blue;">**POST**</span> `/api/orders` - Cria um novo pedido associado a um cliente.
+- <span style="color: green;">**GET**</span> `/api/orders` - Retorna uma lista paginada de pedidos.
+- <span style="color: green;">**GET**</span> `/api/orders/{id}` - Busca um pedido pelo ID.
+- <span style="color: green;">**GET**</span> `/api/orders/customer/{customerId}` - Retorna todos os pedidos de um cliente específico.
 
 ### `ProductController`
 
 Gerencia os produtos disponíveis na plataforma.
 
-- **`GET /api/products`** - Retorna uma lista paginada de produtos.
-- **`GET /api/products/{id}`** - Busca um produto pelo ID.
-- **`POST /api/products`** - Cadastra um novo produto.
-- **`PUT /api/products/{id}`** - Atualiza um produto existente.
-- **`DELETE /api/products/{id}`** - Remove um produto do sistema.
+- <span style="color: green;">**GET**</span> `/api/products` - Retorna uma lista paginada de produtos.
+- <span style="color: green;">**GET**</span> `/api/products/{id}` - Busca um produto pelo ID.
+- <span style="color: blue;">**POST**</span> `/api/products` - Cadastra um novo produto.
+- <span style="color: orange;">**PUT**</span> `/api/products/{id}` - Atualiza um produto existente.
+- <span style="color: red;">**DELETE**</span> `/api/products/{id}` - Remove um produto do sistema.
 
 ### `SupplierController`
 
 Gerencia os fornecedores cadastrados no sistema.
 
-- **`GET /api/suppliers`** - Retorna uma lista paginada de fornecedores.
-- **`GET /api/suppliers/{id}`** - Busca um fornecedor pelo ID.
-- **`POST /api/suppliers`** - Cadastra um novo fornecedor.
-- **`PUT /api/suppliers/{id}`** - Atualiza os dados de um fornecedor.
-- **`DELETE /api/suppliers/{id}`** - Remove um fornecedor do sistema.
-
+- <span style="color: green;">**GET**</span> `/api/suppliers` - Retorna uma lista paginada de fornecedores.
+- <span style="color: green;">**GET**</span> `/api/suppliers/{id}` - Busca um fornecedor pelo ID.
+- <span style="color: blue;">**POST**</span> `/api/suppliers` - Cadastra um novo fornecedor.
+- <span style="color: orange;">**PUT**</span> `/api/suppliers/{id}` - Atualiza os dados de um fornecedor.
+- <span style="color: red;">**DELETE**</span> `/api/suppliers/{id}` - Remove um fornecedor do sistema.
 
 ## Exceções
 
@@ -240,3 +238,84 @@ erDiagram
 A **Order Manager API** foi projetada para oferecer um gerenciamento robusto e eficiente de pedidos e seus componentes. Com a estrutura modular e o uso de tecnologias modernas como Spring Boot, MySQL e MapStruct, a API permite uma fácil escalabilidade e manutenção. O sistema resolve o problema da organização de pedidos, fornecendo endpoints claros e bem documentados para cada entidade essencial ao fluxo de compras, tornando a gestão de pedidos mais ágil e segura.
 
 Além disso, com a implementação de um tratamento avançado de exceções, a API fornece respostas padronizadas, garantindo uma melhor experiência do usuário e facilitando a depuração de erros. O uso de boas práticas, como separação de camadas e injeção de dependências, torna este sistema altamente sustentável e pronto para expansão.
+
+
+
+
+
+
+
+
+
+
+
+
+# Order Manager API
+
+## Índice
+
+1. [Descrição](#descrição)
+2. [Tecnologias Utilizadas](#tecnologias-utilizadas)
+3. [Estrutura do Projeto](#estrutura-do-projeto)
+4. [Configurações](#configurações)
+    - [application.yml](#applicationyml)
+    - [pom.xml](#pomxml)
+5. [Endpoints](#endpoints)
+    - [CustomerController](#customercontroller)
+    - [OrderController](#ordercontroller)
+    - [ProductController](#productcontroller)
+    - [SupplierController](#suppliercontroller)
+6. [Exceções](#exceções)
+    - [Detalhamento das Exceções](#detalhamento-das-exceções)
+7. [Diagrama de Entidade Relacional](#diagrama-de-entidade-relacional)
+8. [Conclusão](#conclusão)
+
+---
+
+
+## Exceções
+
+O sistema possui um robusto mecanismo de tratamento de exceções para garantir que erros sejam tratados de maneira clara e estruturada. Abaixo estão as exceções personalizadas utilizadas na API:
+
+### Exceções Personalizadas
+
+- `CustomerNotFoundException` - Lançada quando um cliente não é encontrado no banco de dados.
+- `OrderNotFoundException` - Lançada quando um pedido não é encontrado.
+- `ProductNotFoundException` - Lançada quando um produto não é encontrado.
+- `SupplierNotFoundException` - Lançada quando um fornecedor não é encontrado.
+- `SupplierDuplicateEmailException` - Lançada quando há tentativa de cadastrar um fornecedor com um e-mail já existente.
+- `ShipmentNotFoundException` - Lançada quando uma entrega não é encontrada.
+
+### Detalhamento das Exceções
+
+#### `GlobalExceptionHandler`
+
+A classe `GlobalExceptionHandler` é responsável por capturar todas as exceções lançadas na aplicação e retornar respostas padronizadas para o cliente. Esta classe utiliza a anotação `@RestControllerAdvice`, garantindo que qualquer erro ocorra de forma centralizada.
+
+**Principais Métodos:**
+
+- `handleCustomerNotFoundException` - Captura exceções `CustomerNotFoundException` e retorna `404 Not Found`.
+- `handleSupplierNotFoundException` - Captura exceções `SupplierNotFoundException` e retorna `404 Not Found`.
+- `handleSupplierDuplicateEmailException` - Captura exceções `SupplierDuplicateEmailException` e retorna `400 Bad Request`.
+- `handleDataIntegrityViolationException` - Captura exceções de integridade de banco de dados e retorna `400 Bad Request`.
+- `handleValidationExceptions` - Captura erros de validação em requisições e retorna `400 Bad Request` com detalhes dos erros.
+- `handleGenericException` - Captura exceções genéricas e retorna `500 Internal Server Error`.
+
+Cada resposta de erro segue um padrão utilizando a classe `ErrorResponse`, que contém os seguintes campos:
+
+```java
+public record ErrorResponse(int status, String message, LocalDateTime timestamp, List<String> errors) {
+    public ErrorResponse(int status, String message, LocalDateTime timestamp) {
+        this(status, message, timestamp, null);
+    }
+}
+```
+
+Essa estrutura garante que todas as respostas de erro sejam consistentes e facilmente interpretáveis pelos clientes da API.
+
+## Conclusão
+
+A **Order Manager API** foi projetada para oferecer um gerenciamento robusto e eficiente de pedidos e seus componentes. Com a estrutura modular e o uso de tecnologias modernas como Spring Boot, MySQL e MapStruct, a API permite uma fácil escalabilidade e manutenção. O sistema resolve o problema da organização de pedidos, fornecendo endpoints claros e bem documentados para cada entidade essencial ao fluxo de compras, tornando a gestão de pedidos mais ágil e segura.
+
+Além disso, com a implementação de um tratamento avançado de exceções, a API fornece respostas padronizadas, garantindo uma melhor experiência do usuário e facilitando a depuração de erros. O uso de boas práticas, como separação de camadas e injeção de dependências, torna este sistema altamente sustentável e pronto para expansão.
+

@@ -13,9 +13,8 @@ import java.util.List;
 @Entity
 @Table(name = "suppliers")
 public class Supplier {
-
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 150)

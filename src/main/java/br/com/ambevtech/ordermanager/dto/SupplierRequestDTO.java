@@ -12,6 +12,7 @@ public record SupplierRequestDTO(
 
         @Email(message = "E-mail inválido.")
         @NotBlank(message = "O e-mail do fornecedor é obrigatório.")
+        @Size(max = 255, message = "O e-mail não pode ter mais de 255 caracteres.")
         String email,
 
         @Pattern(regexp = "\\d{10,11}", message = "Número de telefone inválido.")

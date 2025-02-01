@@ -1,5 +1,6 @@
 package br.com.ambevtech.ordermanager.service;
 
+import br.com.ambevtech.ordermanager.exception.SupplierDuplicateEmailException;
 import br.com.ambevtech.ordermanager.exception.SupplierNotFoundException;
 import br.com.ambevtech.ordermanager.model.Supplier;
 import br.com.ambevtech.ordermanager.repository.SupplierRepository;
@@ -27,6 +28,13 @@ public class SupplierService {
     @Transactional
     public Supplier createSupplier(Supplier supplier) {
         log.info("Cadastrando fornecedor: {}", supplier.getName());
+
+        boolean exists = supplierRepository.existsByEmail(supplier.getEmail());
+        if (exists) {
+            log.error("Erro ao cadastrar fornecedor: O e-mail {} já está em uso.", supplier.getEmail());
+            throw new SupplierDuplicateEmailException("Já existe um fornecedor cadastrado com este e-mail.");
+        }
+
         return supplierRepository.save(supplier);
     }
 

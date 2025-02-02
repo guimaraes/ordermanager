@@ -2,6 +2,7 @@ package br.com.ambevtech.ordermanager.controller;
 
 import br.com.ambevtech.ordermanager.dto.OrderRequestDTO;
 import br.com.ambevtech.ordermanager.dto.OrderResponseDTO;
+import br.com.ambevtech.ordermanager.dto.OrderStatusUpdateDTO;
 import br.com.ambevtech.ordermanager.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,4 +54,15 @@ public class OrderController {
         log.info("Retornando {} pedidos para o cliente ID: {}", orders.getTotalElements(), customerId);
         return ResponseEntity.ok(orders);
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody OrderStatusUpdateDTO dto) {
+        log.info("Recebida solicitação para atualizar status do pedido ID: {}", id);
+        OrderResponseDTO response = orderService.updateOrderStatus(id, dto);
+        log.info("Status atualizado com sucesso para pedido ID: {}", id);
+        return ResponseEntity.ok(response);
+    }
+
 }

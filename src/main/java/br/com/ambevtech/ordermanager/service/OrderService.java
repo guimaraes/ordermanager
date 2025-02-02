@@ -3,19 +3,14 @@ package br.com.ambevtech.ordermanager.service;
 import br.com.ambevtech.ordermanager.dto.OrderItemRequestDTO;
 import br.com.ambevtech.ordermanager.dto.OrderRequestDTO;
 import br.com.ambevtech.ordermanager.dto.OrderResponseDTO;
+import br.com.ambevtech.ordermanager.dto.OrderStatusUpdateDTO;
 import br.com.ambevtech.ordermanager.exception.CustomerNotFoundException;
 import br.com.ambevtech.ordermanager.exception.OrderNotFoundException;
 import br.com.ambevtech.ordermanager.exception.ProductNotFoundException;
 import br.com.ambevtech.ordermanager.mapper.OrderMapper;
-import br.com.ambevtech.ordermanager.model.Customer;
-import br.com.ambevtech.ordermanager.model.Order;
-import br.com.ambevtech.ordermanager.model.OrderItem;
-import br.com.ambevtech.ordermanager.model.Product;
+import br.com.ambevtech.ordermanager.model.*;
 import br.com.ambevtech.ordermanager.model.enums.OrderStatus;
-import br.com.ambevtech.ordermanager.repository.CustomerRepository;
-import br.com.ambevtech.ordermanager.repository.OrderItemRepository;
-import br.com.ambevtech.ordermanager.repository.OrderRepository;
-import br.com.ambevtech.ordermanager.repository.ProductRepository;
+import br.com.ambevtech.ordermanager.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +33,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
 
     public Page<OrderResponseDTO> getAllOrders(Pageable pageable) {
         log.info("Buscando pedidos com paginação. Página: {}, Tamanho: {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -120,5 +116,34 @@ public class OrderService {
         return OrderMapper.toResponseDTO(order);
     }
 
+    @Transactional
+    public OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatusUpdateDTO dto) {
+        log.info("Atualizando status do pedido ID: {} para {}", orderId, dto.newStatus());
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Pedido não encontrado: " + orderId));
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("O pedido só pode ser alterado se estiver PENDENTE.");
+        }
+
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(dto.newStatus());
+        order = orderRepository.save(order);
+
+        OrderHistory orderHistory = OrderHistory.builder()
+                .order(order)
+                .oldStatus(oldStatus)
+                .newStatus(dto.newStatus())
+                .updatedBy(dto.updatedBy())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        orderHistoryRepository.save(orderHistory);
+
+        log.info("Status do pedido ID: {} atualizado para {}", orderId, dto.newStatus());
+
+        return OrderMapper.toResponseDTO(order);
+    }
 
 }

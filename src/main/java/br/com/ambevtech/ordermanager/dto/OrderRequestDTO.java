@@ -14,6 +14,9 @@ public record OrderRequestDTO(
         List<OrderItemRequestDTO> items,
 
         @NotNull(message = "O status do pedido é obrigatório.")
-        OrderStatus status
+        OrderStatus status,
+
+        String externalOrderId
 ) {
 }
+

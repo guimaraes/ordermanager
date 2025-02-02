@@ -17,7 +17,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "orders")
+@Table(name = "orders",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"customer_id", "order_date"}),
+                @UniqueConstraint(columnNames = {"external_order_id"})
+        })
 public class Order {
     @Id
     @GeneratedValue
@@ -40,4 +44,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
+
+    @Column(name = "external_order_id", unique = true, nullable = true)
+    private String externalOrderId;
 }

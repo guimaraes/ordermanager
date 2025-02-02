@@ -3,6 +3,8 @@ package br.com.ambevtech.ordermanager.controller;
 import br.com.ambevtech.ordermanager.dto.OrderRequestDTO;
 import br.com.ambevtech.ordermanager.dto.OrderResponseDTO;
 import br.com.ambevtech.ordermanager.dto.OrderStatusUpdateDTO;
+import br.com.ambevtech.ordermanager.external.kafka.OrderKafkaProducer;
+import br.com.ambevtech.ordermanager.service.ExternalOrderService;
 import br.com.ambevtech.ordermanager.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+    private final ExternalOrderService externalOrderService;
+    private final OrderKafkaProducer orderKafkaProducer;
 
     @PostMapping
     public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO dto) {
@@ -65,4 +69,18 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/external")
+    public ResponseEntity<OrderResponseDTO> receiveExternalOrder(@Valid @RequestBody OrderRequestDTO dto) {
+        log.info("Recebido pedido externo para o cliente ID: {}", dto.customerId());
+        OrderResponseDTO response = externalOrderService.processExternalOrder(dto);
+        log.info("Pedido externo processado com sucesso! ID: {}", response.id());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/external-async")
+    public ResponseEntity<String> receiveExternalOrderAsync(@Valid @RequestBody OrderRequestDTO dto) {
+        log.info("Recebido pedido externo para processamento assíncrono. Cliente ID: {}", dto.customerId());
+        orderKafkaProducer.sendOrder(dto);
+        return ResponseEntity.ok("Pedido enviado para processamento assíncrono.");
+    }
 }

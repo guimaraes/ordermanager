@@ -31,8 +31,8 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final CustomerRepository customerRepository;
     private final OrderItemRepository orderItemRepository;
+    private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderHistoryRepository orderHistoryRepository;
     private final PaymentRepository paymentRepository;
@@ -82,35 +82,43 @@ public class OrderService {
 
         order = orderRepository.save(order);
 
+        List<OrderItem> items = createOrderItems(dto.items(), order);
+        order.getItems().addAll(items);
+
+        BigDecimal totalAmount = calculateTotalAmount(items);
+        order.setTotalAmount(totalAmount);
+        order = orderRepository.save(order);
+
+        Payment payment = createPayment(order);
+
+        log.info("Pedido criado com sucesso! ID: {} - Pagamento associado criado ID: {}", order.getId(), payment.getId());
+
+        return OrderMapper.toResponseDTO(order);
+    }
+
+    public List<OrderItem> createOrderItems(List<OrderItemRequestDTO> itemsDto, Order order) {
         List<OrderItem> items = new ArrayList<>();
 
-        for (OrderItemRequestDTO itemDto : dto.items()) {
+        for (OrderItemRequestDTO itemDto : itemsDto) {
             Product product = productRepository.findById(itemDto.productId())
                     .orElseThrow(() -> new ProductNotFoundException("Produto não encontrado: " + itemDto.productId()));
-
-            BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity()));
 
             OrderItem orderItem = OrderItem.builder()
                     .order(order)
                     .product(product)
                     .quantity(itemDto.quantity())
                     .unitPrice(product.getPrice())
-                    .totalPrice(totalPrice)
+                    .totalPrice(product.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
                     .build();
 
             items.add(orderItem);
         }
 
-        order.getItems().addAll(items);
         orderItemRepository.saveAll(items);
+        return items;
+    }
 
-        BigDecimal totalAmount = items.stream()
-                .map(OrderItem::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        order.setTotalAmount(totalAmount);
-        order = orderRepository.save(order);
-
+    private Payment createPayment(Order order) {
         Payment payment = Payment.builder()
                 .order(order)
                 .paymentDate(LocalDateTime.now())
@@ -119,13 +127,14 @@ public class OrderService {
                 .paymentMethod("UNDEFINED")
                 .build();
 
-        paymentRepository.save(payment);
-
-        log.info("Pedido criado com sucesso! ID: {} - Pagamento associado criado ID: {}", order.getId(), payment.getId());
-
-        return OrderMapper.toResponseDTO(order);
+        return paymentRepository.save(payment);
     }
 
+    public BigDecimal calculateTotalAmount(List<OrderItem> items) {
+        return items.stream()
+                .map(OrderItem::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
     @Transactional
     public OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatusUpdateDTO dto) {

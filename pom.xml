@@ -75,17 +75,23 @@
 			<version>${mysql.version}</version>
 		</dependency>
 
+		<!-- Spring WebFlux (para WebClient)
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>-->
+
 		<!-- Spring Boot AMQP (RabbitMQ) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
 
-		<!-- Spring Boot Kafka -->
+		<!-- Spring Boot Kafka
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- Lombok -->
 		<dependency>

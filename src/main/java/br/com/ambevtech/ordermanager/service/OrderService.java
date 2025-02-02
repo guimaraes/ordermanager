@@ -10,6 +10,7 @@ import br.com.ambevtech.ordermanager.exception.ProductNotFoundException;
 import br.com.ambevtech.ordermanager.mapper.OrderMapper;
 import br.com.ambevtech.ordermanager.model.*;
 import br.com.ambevtech.ordermanager.model.enums.OrderStatus;
+import br.com.ambevtech.ordermanager.model.enums.PaymentStatus;
 import br.com.ambevtech.ordermanager.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
     private final OrderHistoryRepository orderHistoryRepository;
+    private final PaymentRepository paymentRepository;
 
     public Page<OrderResponseDTO> getAllOrders(Pageable pageable) {
         log.info("Buscando pedidos com paginação. Página: {}, Tamanho: {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -108,13 +110,22 @@ public class OrderService {
 
         order.setTotalAmount(totalAmount);
         order = orderRepository.save(order);
-        order = orderRepository.findByIdWithItems(order.getId())
-                .orElseThrow(() -> new OrderNotFoundException("Erro ao recuperar o pedido recém-criado."));
 
-        log.info("Pedido criado com sucesso! ID: {}", order.getId());
+        Payment payment = Payment.builder()
+                .order(order)
+                .paymentDate(LocalDateTime.now())
+                .status(PaymentStatus.PENDING)
+                .amountPaid(BigDecimal.ZERO)
+                .paymentMethod("UNDEFINED")
+                .build();
+
+        paymentRepository.save(payment);
+
+        log.info("Pedido criado com sucesso! ID: {} - Pagamento associado criado ID: {}", order.getId(), payment.getId());
 
         return OrderMapper.toResponseDTO(order);
     }
+
 
     @Transactional
     public OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatusUpdateDTO dto) {

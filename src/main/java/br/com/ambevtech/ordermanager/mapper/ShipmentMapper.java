@@ -5,6 +5,8 @@ import br.com.ambevtech.ordermanager.model.Order;
 import br.com.ambevtech.ordermanager.model.Shipment;
 import br.com.ambevtech.ordermanager.model.enums.ShipmentStatus;
 
+import java.time.LocalDateTime;
+
 public class ShipmentMapper {
 
     public static ShipmentResponseDTO toResponseDTO(Shipment shipment) {
@@ -18,12 +20,11 @@ public class ShipmentMapper {
     }
 
     public static Shipment toEntity(Order order, String trackingNumber) {
-        return new Shipment(
-                null,
-                order,
-                java.time.LocalDateTime.now(),
-                trackingNumber,
-                ShipmentStatus.IN_TRANSIT
-        );
+        return Shipment.builder()
+                .order(order)
+                .shippedDate(LocalDateTime.now())
+                .trackingNumber(trackingNumber)
+                .status(ShipmentStatus.IN_TRANSIT)
+                .build();
     }
 }

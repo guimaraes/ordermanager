@@ -12,17 +12,21 @@ import br.com.ambevtech.ordermanager.model.*;
 import br.com.ambevtech.ordermanager.model.enums.OrderStatus;
 import br.com.ambevtech.ordermanager.model.enums.PaymentStatus;
 import br.com.ambevtech.ordermanager.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -32,10 +36,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderBatchRepository orderBatchRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final OrderHistoryRepository orderHistoryRepository;
     private final PaymentRepository paymentRepository;
+    private final RedisService redisService;
+    private final ObjectMapper objectMapper;
 
     public Page<OrderResponseDTO> getAllOrders(Pageable pageable) {
         log.info("Buscando pedidos com paginação. Página: {}, Tamanho: {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -166,4 +173,45 @@ public class OrderService {
         return OrderMapper.toResponseDTO(order);
     }
 
+    public Page<OrderResponseDTO> getProcessedOrders(Pageable pageable) {
+        return orderRepository.findByStatus(OrderStatus.APPROVED, pageable)
+                .map(OrderMapper::toResponseDTO);
+    }
+
+    public Page<OrderResponseDTO> getOrdersByStatus(OrderStatus status, Pageable pageable) {
+        log.info("Buscando pedidos com status: {}", status);
+        return orderRepository.findByStatus(status, pageable)
+                .map(OrderMapper::toResponseDTO);
+    }
+
+    @Transactional
+    public void processBatchOrders(List<Order> orders) {
+        orderBatchRepository.batchInsertOrders(orders);
+    }
+
+    public List<OrderResponseDTO> getCachedOrdersByStatus(OrderStatus status) {
+        String cacheKey = "orders:status:" + status.name();
+        Optional<String> cachedData = redisService.getFromCache(cacheKey);
+
+        if (cachedData.isPresent()) {
+            try {
+                return objectMapper.readValue(cachedData.get(), new TypeReference<List<OrderResponseDTO>>() {});
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Erro ao desserializar cache", e);
+            }
+        }
+
+        List<OrderResponseDTO> orders = orderRepository.findByStatus(status, Pageable.unpaged())
+                .stream()
+                .map(OrderMapper::toResponseDTO)
+                .toList();
+
+        try {
+            redisService.saveToCache(cacheKey, objectMapper.writeValueAsString(orders));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Erro ao serializar cache", e);
+        }
+
+        return orders;
+    }
 }

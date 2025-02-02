@@ -6,3 +6,6 @@ CREATE TABLE orders (
     total_amount DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
+
+CREATE INDEX idx_order_status ON orders(status);
+CREATE INDEX idx_order_customer ON orders(customer_id);

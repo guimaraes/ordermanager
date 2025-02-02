@@ -4,6 +4,7 @@ import br.com.ambevtech.ordermanager.dto.OrderRequestDTO;
 import br.com.ambevtech.ordermanager.dto.OrderResponseDTO;
 import br.com.ambevtech.ordermanager.dto.OrderStatusUpdateDTO;
 import br.com.ambevtech.ordermanager.external.kafka.OrderKafkaProducer;
+import br.com.ambevtech.ordermanager.model.enums.OrderStatus;
 import br.com.ambevtech.ordermanager.service.ExternalOrderService;
 import br.com.ambevtech.ordermanager.service.OrderService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -82,5 +84,26 @@ public class OrderController {
         log.info("Recebido pedido externo para processamento assíncrono. Cliente ID: {}", dto.customerId());
         orderKafkaProducer.sendOrder(dto);
         return ResponseEntity.ok("Pedido enviado para processamento assíncrono.");
+    }
+
+    @GetMapping("/processed")
+    public ResponseEntity<Page<OrderResponseDTO>> getProcessedOrders(Pageable pageable) {
+        log.info("Buscando pedidos processados...");
+        Page<OrderResponseDTO> orders = orderService.getProcessedOrders(pageable);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<Page<OrderResponseDTO>> getOrdersByStatus(
+            @PathVariable OrderStatus status, Pageable pageable) {
+        log.info("Recebida solicitação para buscar pedidos com status: {}", status);
+        Page<OrderResponseDTO> orders = orderService.getOrdersByStatus(status, pageable);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/cached/status/{status}")
+    public ResponseEntity<List<OrderResponseDTO>> getCachedOrdersByStatus(@PathVariable OrderStatus status) {
+        log.info("Buscando pedidos do status {} no cache", status);
+        return ResponseEntity.ok(orderService.getCachedOrdersByStatus(status));
     }
 }

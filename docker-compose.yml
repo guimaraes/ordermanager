@@ -1,0 +1,83 @@
+version: '3.8'
+
+networks:
+  ordermanager-network:
+    driver: bridge
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_ordermanager
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Xse1,lo0
+      MYSQL_DATABASE: ordermanager
+      MYSQL_USER: ordermanager_user
+      MYSQL_PASSWORD: Xse1,lo0
+    ports:
+      - "3306:3306"
+    networks:
+      - ordermanager-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    container_name: redis_ordermanager
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - ordermanager-network
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka_ordermanager
+    restart: always
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    networks:
+      - ordermanager-network
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper_ordermanager
+    restart: always
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+    networks:
+      - ordermanager-network
+
+  ordermanager:
+    image: ordermanager:latest
+    container_name: ordermanager_app
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ordermanager?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Xse1,lo0
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    ports:
+      - "8080:8080"
+    networks:
+      - ordermanager-network
+
+volumes:
+  mysql_data:

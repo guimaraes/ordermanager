@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,53 +31,53 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO dto) {
-        log.info("Recebida solicitação para criar um novo pedido para o cliente ID: {}", dto.customerId());
-        OrderResponseDTO response = orderService.createOrder(dto);
-        log.info("Pedido criado com sucesso! ID: {}", response.id());
-        return ResponseEntity.ok(response);
+        log.info("Criando novo pedido para cliente ID: {}", dto.customerId());
+        return ResponseEntity.ok(orderService.createOrder(dto));
     }
 
     @GetMapping
-    public ResponseEntity<Page<OrderResponseDTO>> getAllOrders(Pageable pageable) {
-        log.info("Buscando todos os pedidos. Página: {}, Tamanho: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<OrderResponseDTO> orders = orderService.getAllOrders(pageable);
-        log.info("Retornando {} pedidos", orders.getTotalElements());
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<Page<OrderResponseDTO>> getOrders(
+            @RequestParam(required = false) UUID customerId,
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(defaultValue = "false") boolean cached,
+            Pageable pageable) {
+
+        if (customerId != null) {
+            log.info("Buscando pedidos do cliente ID: {}", customerId);
+            return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId, pageable));
+        } else if (status != null) {
+            log.info("Buscando pedidos pelo status: {} (cache: {})", status, cached);
+            if (cached) {
+                List<OrderResponseDTO> cachedOrders = orderService.getCachedOrdersByStatus(status);
+                Page<OrderResponseDTO> pagedResponse = new PageImpl<>(cachedOrders, pageable, cachedOrders.size());
+                return ResponseEntity.ok(pagedResponse);
+            }
+            return ResponseEntity.ok(orderService.getOrdersByStatus(status, pageable));
+        } else {
+            log.info("Buscando todos os pedidos paginados.");
+            return ResponseEntity.ok(orderService.getAllOrders(pageable));
+        }
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable UUID id) {
         log.info("Buscando pedido com ID: {}", id);
-        OrderResponseDTO order = orderService.getOrderById(id);
-        log.info("Pedido encontrado: {}", order);
-        return ResponseEntity.ok(order);
-    }
-
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<Page<OrderResponseDTO>> getOrdersByCustomerId(
-            @PathVariable UUID customerId, Pageable pageable) {
-        log.info("Buscando pedidos do cliente ID: {}. Página: {}, Tamanho: {}", customerId, pageable.getPageNumber(), pageable.getPageSize());
-        Page<OrderResponseDTO> orders = orderService.getOrdersByCustomerId(customerId, pageable);
-        log.info("Retornando {} pedidos para o cliente ID: {}", orders.getTotalElements(), customerId);
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(
             @PathVariable UUID id,
             @Valid @RequestBody OrderStatusUpdateDTO dto) {
-        log.info("Recebida solicitação para atualizar status do pedido ID: {}", id);
-        OrderResponseDTO response = orderService.updateOrderStatus(id, dto);
-        log.info("Status atualizado com sucesso para pedido ID: {}", id);
-        return ResponseEntity.ok(response);
+        log.info("Atualizando status do pedido ID: {}", id);
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, dto));
     }
 
     @PostMapping("/external")
     public ResponseEntity<OrderResponseDTO> receiveExternalOrder(@Valid @RequestBody OrderRequestDTO dto) {
-        log.info("Recebido pedido externo para o cliente ID: {}", dto.customerId());
-        OrderResponseDTO response = externalOrderService.processExternalOrder(dto);
-        log.info("Pedido externo processado com sucesso! ID: {}", response.id());
-        return ResponseEntity.ok(response);
+        log.info("Recebido pedido externo para cliente ID: {}", dto.customerId());
+        return ResponseEntity.ok(externalOrderService.processExternalOrder(dto));
     }
 
     @PostMapping("/external-async")
@@ -85,25 +86,5 @@ public class OrderController {
         orderKafkaProducer.sendOrder(dto);
         return ResponseEntity.ok("Pedido enviado para processamento assíncrono.");
     }
-
-    @GetMapping("/processed")
-    public ResponseEntity<Page<OrderResponseDTO>> getProcessedOrders(Pageable pageable) {
-        log.info("Buscando pedidos processados...");
-        Page<OrderResponseDTO> orders = orderService.getProcessedOrders(pageable);
-        return ResponseEntity.ok(orders);
-    }
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<Page<OrderResponseDTO>> getOrdersByStatus(
-            @PathVariable OrderStatus status, Pageable pageable) {
-        log.info("Recebida solicitação para buscar pedidos com status: {}", status);
-        Page<OrderResponseDTO> orders = orderService.getOrdersByStatus(status, pageable);
-        return ResponseEntity.ok(orders);
-    }
-
-    @GetMapping("/cached/status/{status}")
-    public ResponseEntity<List<OrderResponseDTO>> getCachedOrdersByStatus(@PathVariable OrderStatus status) {
-        log.info("Buscando pedidos do status {} no cache", status);
-        return ResponseEntity.ok(orderService.getCachedOrdersByStatus(status));
-    }
 }
+

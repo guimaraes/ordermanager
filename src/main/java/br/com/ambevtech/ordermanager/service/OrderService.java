@@ -173,11 +173,6 @@ public class OrderService {
         return OrderMapper.toResponseDTO(order);
     }
 
-    public Page<OrderResponseDTO> getProcessedOrders(Pageable pageable) {
-        return orderRepository.findByStatus(OrderStatus.APPROVED, pageable)
-                .map(OrderMapper::toResponseDTO);
-    }
-
     public Page<OrderResponseDTO> getOrdersByStatus(OrderStatus status, Pageable pageable) {
         log.info("Buscando pedidos com status: {}", status);
         return orderRepository.findByStatus(status, pageable)

@@ -16,7 +16,7 @@ public class OrderBatchRepository {
 
     @Transactional
     public void batchInsertOrders(List<Order> orders) {
-        int batchSize = 50; // Pode ser ajustado conforme a necessidade
+        int batchSize = 50;
 
         for (int i = 0; i < orders.size(); i++) {
             entityManager.persist(orders.get(i));

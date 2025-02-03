@@ -16,6 +16,15 @@ public class OrderKafkaProducer {
 
     public void sendOrder(OrderRequestDTO order) {
         log.info("Enviando pedido para o Kafka: {}", order);
-        kafkaTemplate.send(TOPIC, order);
+
+        kafkaTemplate.send(TOPIC, order)
+                .whenComplete((result, exception) -> {
+                    if (exception == null) {
+                        log.info("Pedido {} enviado com sucesso! Offset: {}", order.externalOrderId(), result.getRecordMetadata().offset());
+                    } else {
+                        log.error("Erro ao enviar pedido {} para Kafka: {}", order.externalOrderId(), exception.getMessage());
+                    }
+                });
     }
 }
+
